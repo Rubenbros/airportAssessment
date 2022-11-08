@@ -1,5 +1,3 @@
-import org.apache.commons.text.similarity.FuzzyScore;
-
 import java.io.*;
 import java.util.*;
 
@@ -144,23 +142,53 @@ public class Main {
     //Looks for the best fuzzy Score in the countries names and codes for the string specified
     @SuppressWarnings("OptionalGetWithoutIsPresent")
     private static Country fuzzySearch(HashMap<String,Country> countries, String string){
-        FuzzyScore fuzzyScore = new FuzzyScore(Locale.ENGLISH);
         //retrieves the country where the name had the maximum fuzzy score
         Country maxFuzzyScoreByCountryName = countries
                 .values()
                 .stream()
-                .max(Comparator.comparingInt(country -> fuzzyScore.fuzzyScore(country.getName(),string.toUpperCase())))
+                .max(Comparator.comparingInt(country -> fuzzyScore(country.getName(),string.toUpperCase())))
                 .get();
         //retrieves the country where the code had the maximum fuzzy score
         Country maxFuzzyScoreByCountryCode =countries
                 .values()
                 .stream()
-                .max(Comparator.comparingInt(country -> fuzzyScore.fuzzyScore(country.getCode(),string.toUpperCase())))
+                .max(Comparator.comparingInt(country -> fuzzyScore(country.getCode(),string.toUpperCase())))
                 .get();
         //returns the max from the 2 prioritizing the name in case they are equal
-        return (fuzzyScore.fuzzyScore(maxFuzzyScoreByCountryName.getName(),string.toUpperCase()) >=
-                    fuzzyScore.fuzzyScore(maxFuzzyScoreByCountryCode.getCode(),string.toUpperCase())) ?
+        return (fuzzyScore(maxFuzzyScoreByCountryName.getName(),string.toUpperCase()) >=
+                    fuzzyScore(maxFuzzyScoreByCountryCode.getCode(),string.toUpperCase())) ?
                     maxFuzzyScoreByCountryName :
                     maxFuzzyScoreByCountryCode;
+    }
+
+    //Found this function to calculate fuzzyScore
+    public static Integer fuzzyScore(String term, String query) {
+        if (term != null && query != null) {
+            String termLowerCase = term.toLowerCase(Locale.ENGLISH);
+            String queryLowerCase = query.toLowerCase(Locale.ENGLISH);
+            int score = 0;
+            int termIndex = 0;
+            int previousMatchingCharacterIndex = Integer.MIN_VALUE;
+
+            for(int queryIndex = 0; queryIndex < queryLowerCase.length(); ++queryIndex) {
+                char queryChar = queryLowerCase.charAt(queryIndex);
+
+                for(boolean termCharacterMatchFound = false; termIndex < termLowerCase.length() && !termCharacterMatchFound; ++termIndex) {
+                    char termChar = termLowerCase.charAt(termIndex);
+                    if (queryChar == termChar) {
+                        ++score;
+                        if (previousMatchingCharacterIndex + 1 == termIndex) {
+                            score += 2;
+                        }
+
+                        previousMatchingCharacterIndex = termIndex;
+                        termCharacterMatchFound = true;
+                    }
+                }
+            }
+            return score;
+        } else {
+            throw new IllegalArgumentException("Strings must not be null");
+        }
     }
 }
