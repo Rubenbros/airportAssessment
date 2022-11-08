@@ -3,9 +3,9 @@ import java.util.*;
 
 public class Main {
     //path to files
-    private static final String COUNTRIES_PATH = "resources/countries.csv";
-    private static final String AIRPORTS_PATH = "resources/airports.csv";
-    private static final String RUNWAYS_PATH = "resources/runways.csv";
+    private static String COUNTRIES_PATH;
+    private static String AIRPORTS_PATH;
+    private static String RUNWAYS_PATH;
 
     //Following variables represent the field name to obtain the data
     private static final String COUNTRY_CODE_COLUMN = "code";
@@ -21,9 +21,16 @@ public class Main {
 
     public static void  main(String[] args) {
         //Parameter check
-        if(args.length < 1){
-            System.out.println("ERROR: Number of arguments is incorrect. You must provide a partial/full code or name of a country");
+        if(args.length < 4){
+            System.out.println("ERROR: Number of arguments is incorrect. " +
+                    "You must provide a partial/full code or name of a country" +
+                    "And the three csv files. Example\n" +
+                    "java -jar airportAssessment.jar countries.csv airports.csv runways.csv" );
+            return ;
         }
+        COUNTRIES_PATH=args[1];
+        AIRPORTS_PATH=args[2];
+        RUNWAYS_PATH=args[3];
         //First retrieve countries data (Only code and name)
         HashMap<String,Country> countries = readCountriesFromFile();
         //Then retrieve runway data and export it to a hashmap so we can easily access later
@@ -33,7 +40,7 @@ public class Main {
         //Now we have all the data represented in Objects
 
         //First we print the countries with most airports
-        printCountriesWithMostAirports(countries,NUMBER_OF_RESULTS);
+        printCountriesWithMostAirports(countries);
         //Then we filter the runways by country and airports.
         printRunwaysOfCountry(pairCountry(countries,args[0]));
     }
@@ -47,14 +54,14 @@ public class Main {
             }
         }
     }
-    private static void printCountriesWithMostAirports(HashMap<String,Country> countries,int quantity){
+    private static void printCountriesWithMostAirports(HashMap<String,Country> countries){
         //Retrieves an ordered list of the countries with most  airports limited to the number specified
         List<Country> top = countries
                 .values()
                 .stream()
                 //Custom comparator to order the stream on a descending way
                 .sorted(new CountryAirportCountComparator())
-                .limit(quantity).toList();
+                .limit(NUMBER_OF_RESULTS).toList();
         for (Country country : top)
             System.out.println(country.getName() + "\t|\tnumber of airports: " + country.getAirportList().size());
     }
@@ -63,7 +70,8 @@ public class Main {
     private static HashMap<String,Country> readCountriesFromFile(){
         try {
             HashMap<String,Country> countries = new HashMap<>();
-            BufferedReader br = new BufferedReader(new FileReader(COUNTRIES_PATH));
+            BufferedReader br;
+            br = new BufferedReader(new FileReader(COUNTRIES_PATH));
             String line = br.readLine();
             String[] columns = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)");
             int countryCodeIndex = getColumnIndex(columns, COUNTRY_CODE_COLUMN);
