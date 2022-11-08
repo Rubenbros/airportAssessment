@@ -31,7 +31,7 @@ public class Airport {
         if (code.getClass() == String.class)
             return this.code == code;
         else if(code.getClass() == Airport.class)
-            return this.code == ((Airport) code).code;
+            return this.code.equals(((Airport) code).code);
         return false;
     }
 }

@@ -33,7 +33,7 @@ public class Main {
         RUNWAYS_PATH=args[3];
         //First retrieve countries data (Only code and name)
         HashMap<String,Country> countries = readCountriesFromFile();
-        //Then retrieve runway data and export it to a hashmap so we can easily access later
+        //Then retrieve runway data and export it to a hashmap, so we can easily access later
         HashMap<String, Airport> airports = fillAirports();
         //Retrieve airport data to fill the airport details (including which country are they on)
         fillCountries(airports,countries);
@@ -79,7 +79,7 @@ public class Main {
             while((line = br.readLine()) != null){
                 //Splits only by commas if they are not between " "
                 String[] splitLine = line.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)",4);
-                //the values have commas so we remove them and normalize them by uppercasing them
+                //the values have commas, so we remove them and normalize with an uppercase
                 String countryCode = splitLine[countryCodeIndex].replaceAll("\"","").toUpperCase();
                 String countryName = splitLine[countryNameIndex].replaceAll("\"","").toUpperCase();
                 countries.put(countryCode,new Country(countryCode,countryName));
