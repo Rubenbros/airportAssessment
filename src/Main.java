@@ -25,7 +25,7 @@ public class Main {
             System.out.println("ERROR: Number of arguments is incorrect. " +
                     "You must provide a partial/full code or name of a country" +
                     "And the three csv files. Example\n" +
-                    "java -jar airportAssessment.jar countries.csv airports.csv runways.csv" );
+                    "java -jar airportAssessment.jar spain countries.csv airports.csv runways.csv" );
             return ;
         }
         COUNTRIES_PATH=args[1];
